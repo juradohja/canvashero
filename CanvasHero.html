@@ -1,0 +1,156 @@
+<!--
+	AUTHOR:
+	José Alberto Jurado
+	@juradohja
+-->
+
+<!DOCTYPE html>
+<html lang="">
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<style>
+		canvas {
+			border:1px solid #d3d3d3;
+			background-color: #f1f1f1;
+		}
+		</style>
+		<title>CanvasHero</title>
+	</head>
+	<body onload="startGame()">
+		<script>
+			// KEYCODES
+			let key0 = 49; // 1
+			let key1 = 81; // Q
+			let key2 = 65; // A
+			let key3 = 90; // Z
+
+			var readers = [];
+			var notes = [];
+			var interval = 100;
+			var score = 0;
+
+			function startGame() {
+				readers[0] = new component(100, 100, "darkorange", 50, 50, 0);
+				readers[1] = new component(100, 100, "limegreen", 50, 225, 1);
+				readers[2] = new component(100, 100, "mediumblue", 50, 400, 2);
+				readers[3] = new component(100, 100, "mediumorchid", 50, 575, 3);
+				gameArea.start();
+			}
+
+			let gameArea = {
+				canvas : document.createElement("canvas"),
+				start : function() {
+					this.canvas.width = 1500;
+					this.canvas.height = 700;
+					this.context = this.canvas.getContext("2d");
+					document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+					this.frameNo = 0;
+					this.interval = setInterval(updateGameArea, 20);
+					window.addEventListener('keydown', function (e) {
+						gameArea.key = e.keyCode;
+					});
+					window.addEventListener('keyup', function (e) {
+						gameArea.key = false;
+					});
+				},
+			    clear : function() {
+			        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+			    }
+			};
+
+			function component(width, height, color, x, y, type) {
+			    this.width = width;
+			    this.height = height;
+			    this.x = x;
+			    this.y = y;
+			    this.type = type;
+			    this.show = true;
+			    this.color = color;
+			    this.update = function() {
+			    	if(this.show){
+						const ctx = gameArea.context;
+						ctx.fillStyle = this.color;
+						ctx.fillRect(this.x, this.y, this.width, this.height);
+					}
+			    };
+			}
+
+			function updateGameArea() {
+			    for (i = 0; i < notes.length; i += 1) {
+			        if (notes[i].x < 150 && notes[i].x > 0) {
+						switch(notes[i].type){
+							case 0:
+								if (gameArea.key && gameArea.key === key0) {
+									notes[i].color = "lemonchiffon";
+									score += 10;
+									}
+								break;
+							case 1:
+								if (gameArea.key && gameArea.key === key1) {
+									notes[i].color = "palegreen";
+									score += 10;
+								}
+								break;
+							case 2:
+								if (gameArea.key && gameArea.key === key2) {
+									notes[i].color = "powderblue";
+									score += 10;
+								}
+								break;
+							case 3:
+								if (gameArea.key && gameArea.key === key3) {
+									notes[i].color = "lavender";
+									score += 10;
+								}
+								break;
+						}
+			        } 
+			    }
+			    gameArea.clear();
+			    gameArea.frameNo += 1;
+				if (gameArea.frameNo === 1 || everyinterval(interval)) {
+					var x, type;
+					x = gameArea.canvas.width;
+					type = Math.floor(Math.random() * (3 + 1));
+					switch (type) {
+						case 0:
+							notes.push(new component(50, 50, "gold", x, 75, 0));
+							break;
+						case 1:
+							notes.push(new component(50, 50, "greenyellow", x, 250, 1));
+							break;
+						case 2:
+							notes.push(new component(50, 50, "deepskyblue", x, 425, 2));
+							break;
+						case 3:
+							notes.push(new component(50, 50, "magenta", x, 600, 3));
+							break;
+					}
+					if(interval>10){
+						interval += -2;
+					}
+				}
+				for (var i = 0; i < readers.length; i += 1) {
+					readers[i].update();
+				}
+				for (i = 0; i < notes.length; i += 1) {
+					notes[i].x += -5;
+					notes[i].update();
+				}
+				const ctx = gameArea.context;
+				ctx.font = "30px Montserrat";
+				ctx.fillStyle = "black";
+				ctx.fillText("Score: "+score, 1300, 50);
+
+				if (gameArea.key && gameArea.key === key0) { readers[0].color = "orangered"; } else { readers[0].color = "darkorange" ; }
+				if (gameArea.key && gameArea.key === key1) { readers[1].color = "forestgreen"; } else { readers[1].color = "limegreen" ; }
+				if (gameArea.key && gameArea.key === key2) { readers[2].color = "darkblue"; } else { readers[2].color = "mediumblue" ; }
+				if (gameArea.key && gameArea.key === key3) { readers[3].color = "darkmagenta"; } else { readers[3].color = "mediumorchid" ; }
+			}
+
+			function everyinterval(n) {
+				return (gameArea.frameNo / n) % 1 === 0;
+			}
+		</script>
+	</body>
+</html>
